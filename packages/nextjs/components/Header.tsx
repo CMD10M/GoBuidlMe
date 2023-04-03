@@ -36,8 +36,11 @@ export const Header = () => {
 
   const navLinks = (
     <>
+          <li>
+        <NavLink href="/homepage">Home</NavLink>
+      </li>
       <li>
-        <NavLink href="/">Home</NavLink>
+        <NavLink href="/createproposal">Create A Proposal</NavLink>
       </li>
       <li>
         <NavLink href="/debug">
@@ -46,9 +49,14 @@ export const Header = () => {
         </NavLink>
       </li>
       <li>
-        <NavLink href="/example-ui">
+        <NavLink href="/donate">
           <SparklesIcon className="h-4 w-4" />
-          Example UI
+          Donate To A Proposal
+        </NavLink>
+      </li>
+      <li>
+        <NavLink href="/pastproposals">
+          Past Proposals
         </NavLink>
       </li>
     </>

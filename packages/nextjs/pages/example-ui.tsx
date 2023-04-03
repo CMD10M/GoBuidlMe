@@ -1,24 +1,33 @@
 import Head from "next/head";
+import Link from "next/link";
 import type { NextPage } from "next";
-import { ContractData } from "~~/components/example-ui/ContractData";
-import { ContractInteraction } from "~~/components/example-ui/ContractInteraction";
+import { BugAntIcon, SparklesIcon } from "@heroicons/react/24/outline";
+import { useScaffoldContractRead, useScaffoldContractWrite} from "~~/hooks/scaffold-eth";
+import { useState } from "react";
+import { ethers } from "ethers";
 
-const ExampleUI: NextPage = () => {
+// const event=useScaffoldEventSubscriber({
+//   contractName: "GoBuidlMe",
+//   eventName: "ProposalCreated",
+//   listener: (proposalName, proposalDescription, beneficiary, requested_amount, start, end) => {
+//     console.log("ProposalCreated", proposalName, proposalDescription, beneficiary, requested_amount, start, end);
+//   }
+// });
+
+// const { data: currentProposalName } = useScaffoldContractRead({
+//   contractName: "GoBuidlMe",
+//   functionName: "proposalName",
+// });
+
+
+const Donate: NextPage = () => {
   return (
     <>
-      <Head>
-        <title>Scaffold-eth Example Ui</title>
-        <meta name="description" content="Created with 🏗 scaffold-eth" />
-        {/* We are importing the font this way to lighten the size of SE2. */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link href="https://fonts.googleapis.com/css2?family=Bai+Jamjuree&display=swap" rel="stylesheet" />
-      </Head>
-      <div className="grid lg:grid-cols-2 flex-grow" data-theme="exampleUi">
-        <ContractInteraction />
-        <ContractData />
-      </div>
+
+        <div>test</div>
+
     </>
   );
 };
 
-export default ExampleUI;
+export default Donate;

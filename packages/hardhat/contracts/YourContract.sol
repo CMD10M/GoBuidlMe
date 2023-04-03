@@ -11,68 +11,76 @@ import "hardhat/console.sol";
  * It also allows the owner to withdraw the Ether in the contract
  * @author BuidlGuidl
  */
-contract YourContract {
+contract GoBuidlMe {
+    string public proposalName;
+    string public proposalDescription;
+    address public beneficiary;
+    uint public requested_amount;
+    uint public donations;
+    uint public start;
+    uint public end;
+    bool public finalized;
+    mapping(address => bool) public donated;
+    mapping(address => uint256) public donationAmount;
+    address[] public donors;
 
-    // State Variables
-    address public immutable owner;
-    string public greeting = "Building Unstoppable Apps!!!";
-    bool public premium = false;
-    uint256 public totalCounter = 0;
-    mapping(address => uint) public userGreetingCounter;
+event ProposalCreated(
+    string proposalName,
+    string proposalDescription,
+    address beneficiary,
+    uint requested_amount,
+    uint start,
+    uint end
+);
 
-    // Events: a way to emit log statements from smart contract that can be listened to by external parties
-    event GreetingChange(address greetingSetter, string newGreeting, bool premium, uint256 value);
+event finalizedProposal(
+    bool finalized,
+    uint donations
+);
 
-    // Constructor: Called once on contract deployment
-    // Check packages/hardhat/deploy/00_deploy_your_contract.ts
-    constructor(address _owner) {
-        owner = _owner;
+    
+    function createProposal(string memory _proposalName, string memory _proposalDescription, address _beneficiary, uint _requested_amount, uint _durationInDays) public {
+        require(finalized, "Previous proposal has not been finalized yet.");
+        // require(_durationInDays <= 10, "Duration cannot be greater than 10 days.");
+        proposalName = _proposalName;
+        proposalDescription = _proposalDescription;
+        beneficiary = _beneficiary;
+        requested_amount = _requested_amount;
+        start = block.timestamp;
+        end = start + (_durationInDays * 1 minutes);
+        finalized = false;
+
+        emit ProposalCreated(proposalName, proposalDescription, beneficiary, requested_amount, start, end);
     }
 
-    // Modifier: used to define a set of rules that must be met before or after a function is executed
-    // Check the withdraw() function
-    modifier isOwner() {
-        // msg.sender: predefined variable that represents address of the account that called the current function
-        require(msg.sender == owner, "Not the Owner");
-        _;
+    function donate() public payable {
+        require(block.timestamp < end, "Donation period has ended");
+        donated[msg.sender] = true;
+        donors.push(msg.sender);
+        uint256 amount = msg.value;
+        donationAmount[msg.sender] = amount;
+        donations += amount;
     }
+    
+    function finalize() public payable {
+        require(!finalized, "Already finalized");
+        require(block.timestamp >= end, "Donation period has not ended yet");
+        finalized = true;
+        (bool sent,) = beneficiary.call{value: donations}("");
+        require(sent, "Failed to send Ether");
 
-    /**
-     * Function that allows anyone to change the state variable "greeting" of the contract and increase the counters
-     *
-     * @param _newGreeting (string memory) - new greeting to save on the contract
-     */
-    function setGreeting(string memory _newGreeting) public payable {
-        // Print data to the hardhat chain console. Remove when deploying to a live network.
-        console.log("Setting new greeting '%s' from %s",  _newGreeting, msg.sender);
-
-        // Change state variables
-        greeting = _newGreeting;
-        totalCounter += 1;
-        userGreetingCounter[msg.sender] += 1;
-
-        // msg.value: built-in global variable that represents the amount of ether sent with the transaction
-        if (msg.value > 0) {
-            premium = true;
-        } else {
-            premium = false;
+        emit finalizedProposal(finalized, donations);
         }
 
-        // emit: keyword used to trigger an event
-        emit GreetingChange(msg.sender, _newGreeting, msg.value > 0, 0);
+    function cancel() public payable {
+        require(donated[msg.sender], "Sender has not donated yet");
+        require(!finalized, "Proposal has already been finalized");
+        require(block.timestamp < end, "Donation period has ended");
+        uint256 amount = donationAmount[msg.sender];
+        donationAmount[msg.sender] = 0;
+        donated[msg.sender] = false;
+        donations -= amount;
+        (bool sent,) = msg.sender.call{value: amount}("");
+        require(sent, "Failed to send Ether");
     }
-
-    /**
-     * Function that allows the owner to withdraw all the Ether in the contract
-     * The function can only be called by the owner of the contract as defined by the isOwner modifier
-     */
-    function withdraw() isOwner public {
-        (bool success,) = owner.call{value: address(this).balance}("");
-        require(success, "Failed to send Ether");
-    }
-
-    /**
-     * Function that allows the contract to receive ETH
-     */
-    receive() external payable {}
 }
