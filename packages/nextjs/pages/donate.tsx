@@ -89,16 +89,25 @@ const Test : NextPage = ( ) => {
     await finalize();
   }
 
+  const{writeAsync: canceled} = useScaffoldContractWrite({
+    contractName: "GoBuidlMe",
+    functionName: "cancel",
+  });
+  
+  const handlecancel = async () => {
+    await canceled();
+  }
+
   const [donation, setdonation] = useState("0");
 
-  const{writeAsync: donate} = useScaffoldContractWrite({
+  const{writeAsync: donated} = useScaffoldContractWrite({
     contractName: "GoBuidlMe",
     functionName: "donate",
     value: donation,
   });
 
   const handleDonate = async () => {
-    await donate();
+    await donated();
   };
 
 
@@ -123,11 +132,23 @@ const Test : NextPage = ( ) => {
     />
     <div className="flex justify-center">
       <div className="flex flex-col items-center justify-center">
-        <button className="flex-shrink-0 inline-flex items-center justify-center px-4 py-2 font-medium text-white bg-blue-500 border border-transparent rounded-lg shadow-sm transition duration-200 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 mb-4"
-          onClick={handleDonate}
-        >
-          Donate
-        </button>
+      <div className="flex flex-row space-x-4">
+  <button 
+    className="flex-shrink-0 inline-flex items-center justify-center px-4 py-2 font-medium text-white bg-blue-500 border border-transparent rounded-lg shadow-sm transition duration-200 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 mb-4"
+    onClick={handleDonate}
+  >
+    Donate
+  </button>
+  <button 
+    className="flex-shrink-0 inline-flex items-center justify-center px-4 py-2 font-medium text-white bg-blue-500 border border-transparent rounded-lg shadow-sm transition duration-200 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 mb-4"
+    onClick={handlecancel}
+  >
+    Refund
+  </button>
+</div>
+
+
+
         <div className="py-4">
           <button 
             className="flex-shrink-0 inline-flex items-center justify-center bg-blue-500 text-white font-medium py-1 px-3 rounded-lg transition duration-200 hover:bg-blue-600"

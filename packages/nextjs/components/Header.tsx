@@ -51,7 +51,7 @@ export const Header = () => {
       <li>
         <NavLink href="/donate">
           <SparklesIcon className="h-4 w-4" />
-          Donate To A Proposal
+          Donate
         </NavLink>
       </li>
       <li>

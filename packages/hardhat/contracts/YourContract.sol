@@ -11,6 +11,84 @@ import "hardhat/console.sol";
  * It also allows the owner to withdraw the Ether in the contract
  * @author BuidlGuidl
  */
+// contract GoBuidlMe {
+//     string public proposalName;
+//     string public proposalDescription;
+//     address public beneficiary;
+//     uint public requested_amount;
+//     uint public donations;
+//     uint public start;
+//     uint public end;
+//     bool public finalized;
+//     mapping(address => bool) public donated;
+//     mapping(address => uint256) public donationAmount;
+//     address[] public donors;
+
+//     struct Proposal {
+//         string proposalName;
+//         string proposalDescription;
+//         address beneficiary;
+//         uint requested_amount;
+//         uint donations;
+//         uint start;
+//         uint end;
+//         bool finalized;
+//     }
+
+//     Proposal[] public proposals;
+
+//     constructor() {
+//         finalized = true;
+//     }
+
+//     function createProposal(string memory _proposalName, string memory _proposalDescription, address _beneficiary, uint _requested_amount, uint _durationInDays) public {
+//         require(finalized, "Previous proposal has not been finalized yet.");
+//         require(_durationInDays <= 10, "Duration cannot be greater than 10 days.");
+//         Proposal memory newProposal;
+//         newProposal.proposalName = _proposalName;
+//         newProposal.proposalDescription = _proposalDescription;
+//         newProposal.beneficiary = _beneficiary;
+//         newProposal.requested_amount = _requested_amount;
+//         newProposal.start = block.timestamp;
+//         newProposal.end = newProposal.start + (_durationInDays * 1 minutes);
+//         newProposal.finalized = false;
+//         proposals.push(newProposal);
+//         finalized = false;
+//     }
+
+//     function donate() public payable {
+//         require(block.timestamp < end, "Donation period has ended");
+//         donated[msg.sender] = true;
+//         donors.push(msg.sender);
+//         uint256 amount = msg.value;
+//         donationAmount[msg.sender] = amount;
+//         donations += amount;
+//     }
+
+//     function finalize() public payable {
+//         require(!finalized, "Already finalized");
+//         require(block.timestamp >= end, "Donation period has not ended yet");
+//         finalized = true;
+//         (bool sent,) = beneficiary.call{value: donations}("");
+//         require(sent, "Failed to send Ether");
+//     }
+
+//     function cancel() public payable {
+//         require(donated[msg.sender], "Sender has not donated yet");
+//         require(!finalized, "Proposal has already been finalized");
+//         require(block.timestamp < end, "Donation period has ended");
+//         uint256 amount = donationAmount[msg.sender];
+//         donationAmount[msg.sender] = 0;
+//         donated[msg.sender] = false;
+//         donations -= amount;
+//         (bool sent,) = msg.sender.call{value: amount}("");
+//         require(sent, "Failed to send Ether");
+//     }
+// }
+
+
+
+
 contract GoBuidlMe {
     string public proposalName;
     string public proposalDescription;
@@ -24,20 +102,12 @@ contract GoBuidlMe {
     mapping(address => uint256) public donationAmount;
     address[] public donors;
 
-event ProposalCreated(
-    string proposalName,
-    string proposalDescription,
-    address beneficiary,
-    uint requested_amount,
-    uint start,
-    uint end
-);
+    constructor() {
+        finalized = true;
+    }
 
-event finalizedProposal(
-    bool finalized,
-    uint donations
-);
-
+    event ProposalCreated(string proposalName, string proposalDescription, address beneficiary, uint requested_amount, uint end);
+    event Donations(uint donations);
     
     function createProposal(string memory _proposalName, string memory _proposalDescription, address _beneficiary, uint _requested_amount, uint _durationInDays) public {
         require(finalized, "Previous proposal has not been finalized yet.");
@@ -49,8 +119,7 @@ event finalizedProposal(
         start = block.timestamp;
         end = start + (_durationInDays * 1 minutes);
         finalized = false;
-
-        emit ProposalCreated(proposalName, proposalDescription, beneficiary, requested_amount, start, end);
+        emit ProposalCreated(_proposalName, _proposalDescription, _beneficiary, _requested_amount, end);
     }
 
     function donate() public payable {
@@ -60,6 +129,7 @@ event finalizedProposal(
         uint256 amount = msg.value;
         donationAmount[msg.sender] = amount;
         donations += amount;
+        emit Donations(donations);
     }
     
     function finalize() public payable {
@@ -68,8 +138,7 @@ event finalizedProposal(
         finalized = true;
         (bool sent,) = beneficiary.call{value: donations}("");
         require(sent, "Failed to send Ether");
-
-        emit finalizedProposal(finalized, donations);
+        delete donations;
         }
 
     function cancel() public payable {
