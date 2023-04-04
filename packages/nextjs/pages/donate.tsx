@@ -164,7 +164,7 @@ const remaining_minutes = (remaining_seconds / 60) < 0 ? 0 : (remaining_seconds 
             className="flex-shrink-0 inline-flex items-center justify-center bg-blue-500 text-white font-medium py-1 px-3 rounded-lg transition duration-200 hover:bg-blue-600"
             onClick={handlefinalyze}
           >
-            Finalize This Proposal
+            Finalize Proposal
           </button>
         </div>
       </div>
