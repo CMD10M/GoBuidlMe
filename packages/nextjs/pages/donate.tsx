@@ -86,9 +86,10 @@ console.log(currentTimeInSeconds);
 console.log(currentend - currentTimeInSeconds);
 
 const remaining_seconds = (currentend - currentTimeInSeconds) < 0 ? 0 : (currentend - currentTimeInSeconds);
-const remaining_days = (remaining_seconds / 86400) < 0 ? 0 : (remaining_seconds / 86400);
-const remaining_hours = (remaining_seconds / 3600) < 0 ? 0 : (remaining_seconds / 3600);
-const remaining_minutes = (remaining_seconds / 60) < 0 ? 0 : (remaining_seconds / 60);
+const remaining_days = (remaining_seconds / 86400) < 0 ? 0 : (remaining_seconds / 86400).toFixed(0);
+const remaining_hours = (remaining_seconds / 3600) < 0 ? 0 : (remaining_seconds / 3600).toFixed(0);
+const remaining_minutes = (remaining_seconds / 60) < 0 ? 0 : (remaining_seconds / 60).toFixed(0);
+
 
 
   const{writeAsync: finalize} = useScaffoldContractWrite({
