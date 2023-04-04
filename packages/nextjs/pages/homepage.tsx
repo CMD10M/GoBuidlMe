@@ -23,7 +23,7 @@ const Homepage : NextPage = ( ) => {
       <Link href="/createproposal" className="btn btn-primary py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transition duration-200">
         Create A Proposal
       </Link>
-      <Link href="/test" className="btn btn-secondary py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transition duration-200">
+      <Link href="/donate" className="btn btn-secondary py-2 px-6 rounded-lg shadow-lg hover:shadow-xl transition duration-200">
         Donate To A Proposal
       </Link>
     </div>
