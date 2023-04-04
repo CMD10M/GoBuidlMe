@@ -80,6 +80,17 @@ const Test : NextPage = ( ) => {
   const futureHourEnd = futureDateEnd.getUTCHours();
   const futureMinuteEnd = futureDateEnd.getUTCMinutes();
 
+const currentTimeInSeconds = Math.floor(new Date().getTime() / 1000);
+
+console.log(currentTimeInSeconds);
+console.log(currentend - currentTimeInSeconds);
+
+const remaining_seconds = (currentend - currentTimeInSeconds) < 0 ? 0 : (currentend - currentTimeInSeconds);
+const remaining_days = (remaining_seconds / 86400) < 0 ? 0 : (remaining_seconds / 86400);
+const remaining_hours = (remaining_seconds / 3600) < 0 ? 0 : (remaining_seconds / 3600);
+const remaining_minutes = (remaining_seconds / 60) < 0 ? 0 : (remaining_seconds / 60);
+
+
   const{writeAsync: finalize} = useScaffoldContractWrite({
     contractName: "GoBuidlMe",
     functionName: "finalize",
@@ -122,8 +133,7 @@ const Test : NextPage = ( ) => {
   <p className="mr-2">Beneficiary:</p>
   <Address address={currentbeneficiary} />
 </div>
-    <p className="text-gray-600 mb-4">Start Date: {futureDayStart} {futureMonthNameStart} {futureYearStart}| Hour: {futureHourStart} Minute: {futureMinuteStart} </p>
-    <p className="text-gray-600 mb-4">End Date: {futureDayEnd} {futureMonthNameEnd} {futureYearEnd}| Hour: {futureHourEnd} Minute: {futureMinuteEnd} </p>
+    <p className="text-gray-600 mb-4">Time Remaining: {remaining_days} Days, {remaining_hours} Hours, {remaining_minutes} Minutes</p>
     <p className="text-gray-600 mb-8" >Donations: {ethDonations} ETH</p>
     <input className="w-48 px-4 py-2 mb-4 text-gray-700 bg-white border border-gray-300 rounded-lg focus:outline-none focus:shadow-outline-blue focus:border-blue-300"
       placeholder="ETH Donation"
