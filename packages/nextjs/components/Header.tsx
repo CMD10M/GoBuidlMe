@@ -43,14 +43,9 @@ export const Header = () => {
         <NavLink href="/createproposal">Create A Proposal</NavLink>
       </li>
       <li>
-        <NavLink href="/donate">
+        <NavLink href="/donate2">
           <SparklesIcon className="h-4 w-4" />
           Donate
-        </NavLink>
-      </li>
-      <li>
-        <NavLink href="/pastproposals">
-          Past Proposals
         </NavLink>
       </li>
     </>

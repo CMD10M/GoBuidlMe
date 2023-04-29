@@ -13,65 +13,83 @@ import "hardhat/console.sol";
  */
 
 contract GoBuidlMe {
-    string public proposalName;
-    string public proposalDescription;
-    address public beneficiary;
-    uint public requested_amount;
-    uint public donations;
-    uint public start;
-    uint public end;
-    bool public finalized;
-    mapping(address => bool) public donated;
-    mapping(address => uint256) public donationAmount;
-    address[] public donors;
-
     constructor() {
-        finalized = true;
     }
+        struct Proposals {
+            uint index;
+            string proposalName;
+            string proposalDescription;
+            address beneficiary;
+            uint requested_amount;
+            uint donations;
+            uint start;
+            uint end;
+            bool finalized;
+    }
+
+    mapping(uint => mapping(address => bool)) public donated;
+    mapping(uint => mapping(address => uint256)) public donationAmount;
+
+    Proposals[] public createProposals;
 
     event ProposalCreated(string proposalName, string proposalDescription, address beneficiary, uint requested_amount, uint end);
     event Donations(uint donations);
     
     function createProposal(string memory _proposalName, string memory _proposalDescription, address _beneficiary, uint _requested_amount, uint _durationInDays) public {
-        require(finalized, "Previous proposal has not been finalized yet.");
-        // require(_durationInDays <= 10, "Duration cannot be greater than 10 days.");
-        proposalName = _proposalName;
-        proposalDescription = _proposalDescription;
-        beneficiary = _beneficiary;
-        requested_amount = _requested_amount;
-        start = block.timestamp;
-        end = start + (_durationInDays * 1 minutes);
-        finalized = false;
-        emit ProposalCreated(_proposalName, _proposalDescription, _beneficiary, _requested_amount, end);
+        uint256 endtime = block.timestamp + (_durationInDays * 1 minutes);
+        createProposals.push(Proposals({
+            proposalName: _proposalName, 
+            proposalDescription: _proposalDescription,
+            beneficiary: _beneficiary,
+            requested_amount: _requested_amount,
+            start: block.timestamp,
+            end: endtime,
+            finalized: false,
+            index: createProposals.length,
+            donations: 0
+            }));
+
+        emit ProposalCreated(_proposalName, _proposalDescription, _beneficiary, _requested_amount, endtime);
     }
 
-    function donate() public payable {
-        require(block.timestamp < end, "Donation period has ended");
-        donated[msg.sender] = true;
-        donors.push(msg.sender);
+function getProposals() public view returns (Proposals[] memory) {
+    Proposals[] memory proposals = new Proposals[](createProposals.length);
+    for (uint i = 0; i < createProposals.length; i++) {
+        Proposals memory proposal = createProposals[i];
+        proposals[i] = proposal;
+    }
+    return proposals;
+}
+
+    function donate(uint256 proposalID) public payable {
+        Proposals storage proposal = createProposals[proposalID];
+        require(block.timestamp < proposal.end, "Donation period has ended");
+        donated[proposalID][msg.sender] = true;
+        donationAmount[proposalID][msg.sender] += msg.value;
         uint256 amount = msg.value;
-        donationAmount[msg.sender] = amount;
-        donations += amount;
-        emit Donations(donations);
+        proposal.donations += amount;
+        emit Donations(proposal.donations);
     }
     
-    function finalize() public payable {
-        require(!finalized, "Already finalized");
-        require(block.timestamp >= end, "Donation period has not ended yet");
-        finalized = true;
-        (bool sent,) = beneficiary.call{value: donations}("");
+    function finalize(uint256 proposalID) public payable {
+        Proposals storage proposal = createProposals[proposalID];
+        require(!proposal.finalized, "Already finalized");
+        require(block.timestamp >= proposal.end, "Donation period has not ended yet");
+        proposal.finalized = true;
+        (bool sent,) = proposal.beneficiary.call{value: proposal.donations}("");
         require(sent, "Failed to send Ether");
-        delete donations;
+        delete proposal.donations;
         }
 
-    function cancel() public payable {
-        require(donated[msg.sender], "Sender has not donated yet");
-        require(!finalized, "Proposal has already been finalized");
-        require(block.timestamp < end, "Donation period has ended");
-        uint256 amount = donationAmount[msg.sender];
-        donationAmount[msg.sender] = 0;
-        donated[msg.sender] = false;
-        donations -= amount;
+    function cancel(uint256 proposalID) public payable {
+        Proposals storage proposal = createProposals[proposalID];
+        require(donated[proposalID][msg.sender], "Sender has not donated yet");
+        require(!proposal.finalized, "Proposal has already been finalized");
+        require(block.timestamp < proposal.end, "Donation period has ended");
+        uint256 amount = donationAmount[proposalID][msg.sender];
+        donationAmount[proposalID][msg.sender] = 0;
+        donated[proposalID][msg.sender] = false;
+        proposal.donations -= amount;
         (bool sent,) = msg.sender.call{value: amount}("");
         require(sent, "Failed to send Ether");
     }

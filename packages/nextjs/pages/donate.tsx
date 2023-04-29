@@ -91,7 +91,6 @@ const remaining_hours = (remaining_seconds / 3600) < 0 ? 0 : (remaining_seconds 
 const remaining_minutes = (remaining_seconds / 60) < 0 ? 0 : (remaining_seconds / 60).toFixed(0);
 
 
-
   const{writeAsync: finalize} = useScaffoldContractWrite({
     contractName: "GoBuidlMe",
     functionName: "finalize",
