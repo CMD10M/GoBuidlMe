@@ -52,6 +52,8 @@ const CreateProposal: NextPage = () => {
         </div>
         <div className="flex flex-col items-start w-1/2">
           <label className="text-gray-600 font-medium mb-2">Beneficiary:</label>
+          {/* Maybe use here AddressInput it will resolve ens too */}
+          {/* <AddressInput value={beneficiary} onChange={e => setBeneficiary(e)} /> */}
           <input
             className="border border-gray-400 rounded-lg py-2 px-3 mb-4 w-full"
             type="text"

@@ -62,6 +62,7 @@ function getProposals() public view returns (Proposals[] memory) {
 }
 
     function donate(uint256 proposalID) public payable {
+        console.log("ProposalID", proposalID);
         Proposals storage proposal = createProposals[proposalID];
         require(block.timestamp < proposal.end, "Donation period has ended");
         donated[proposalID][msg.sender] = true;

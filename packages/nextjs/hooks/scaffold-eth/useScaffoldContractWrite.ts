@@ -44,7 +44,7 @@ export const useScaffoldContractWrite = <
     ...writeConfig,
   });
 
-  const sendContractWriteTx = async () => {
+  const sendContractWriteTx = async ({ recklessArgs }: { recklessArgs?: any[] } = {}) => {
     if (!deployedContractData) {
       notification.error("Target Contract is not deployed, did you forgot to run `yarn deploy`?");
       return;
@@ -61,7 +61,11 @@ export const useScaffoldContractWrite = <
     if (wagmiContractWrite.writeAsync) {
       try {
         setIsMining(true);
-        await writeTx(wagmiContractWrite.writeAsync());
+        if (recklessArgs) {
+          await writeTx(wagmiContractWrite.writeAsync({ recklesslySetUnpreparedArgs: recklessArgs as unknown[] }));
+        } else {
+          await writeTx(wagmiContractWrite.writeAsync());
+        }
       } catch (e: any) {
         const message = getParsedEthersError(e);
         notification.error(message);

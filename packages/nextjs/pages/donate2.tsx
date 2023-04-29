@@ -8,13 +8,12 @@ export const NUMBER_REGEX = /^\.?\d+\.?\d*$/;
 
 const Test2: NextPage = () => {
   // const [proposals, setProposals] = useState([]);
-  const [index, setIndex] = useState("0");
+  const [index, setIndex] = useState(ethers.BigNumber.from("0"));
 
   const { data: proposal } = useScaffoldContractRead({
     contractName: "GoBuidlMe",
     functionName: "getProposals",
   });
-  console.log("⚡️ ~ file: donate2.tsx:20 ~ proposal:", proposal?.[0].end.toString());
 
   const proposalArr = typeof proposal === "object" ? Object.values(proposal) : [];
   const [donation, setdonation] = useState("0");
@@ -23,11 +22,12 @@ const Test2: NextPage = () => {
     contractName: "GoBuidlMe",
     functionName: "donate",
     value: donation,
-    args: [ethers.BigNumber.from(index)],
+    args: [index],
   });
+
   const handleDonate = async (proposalIndex: BigNumber) => {
-    setIndex(proposalIndex.toString());
-    await donated();
+    setIndex(proposalIndex);
+    await donated({ recklessArgs: [proposalIndex] });
   };
 
   return (
@@ -36,7 +36,7 @@ const Test2: NextPage = () => {
         // proposal.end is a BigNumber, so we need to convert it to a number and then compare it to the current time (You have .toString() on BigNumber to convert it to a string human readable string instead of 0x)
         .filter(proposal => parseFloat(proposal.end.toString()) > Math.floor(Date.now() / 1000))
         .map(proposal => (
-          <div key={proposal.proposalName} className="max-w-6xl mx-auto py-12">
+          <div key={proposal.index.toString()} className="max-w-6xl mx-auto py-12">
             <div className="bg-white rounded-lg shadow-md w-full px-6 py-8 md:mx-4 mb-6 md:mb-0 text-center overflow-auto justify-between flex-row">
               <h2 className="text-2xl font-bold mb-6">{proposal.proposalName}</h2>
               <p className="text-gray-600 mb-4 whitespace-normal break-words">
