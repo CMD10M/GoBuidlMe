@@ -48,6 +48,9 @@ export const Header = () => {
           Donate
         </NavLink>
       </li>
+      <li>
+        <NavLink href="/pastproposals">Past Proposals</NavLink>
+      </li>
     </>
   );
 

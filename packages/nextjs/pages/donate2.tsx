@@ -15,6 +15,7 @@ const Test2: NextPage = () => {
     functionName: "getProposals",
   });
 
+
   const proposalArr = typeof proposal === "object" ? Object.values(proposal) : [];
   const [donation, setdonation] = useState("0");
 
@@ -30,11 +31,34 @@ const Test2: NextPage = () => {
     await donated({ recklessArgs: [proposalIndex] });
   };
 
+  const { writeAsync: canceled } = useScaffoldContractWrite({
+    contractName: "GoBuidlMe",
+    functionName: "cancel",
+    args: [index],
+  });
+
+  const handlecancel = async (proposalIndex: BigNumber) => {
+    setIndex(proposalIndex);
+    await canceled({ recklessArgs: [proposalIndex] });
+  };
+
+  const{writeAsync: finalize} = useScaffoldContractWrite({
+    contractName: "GoBuidlMe",
+    functionName: "finalize",
+    args: [index],
+  });
+  
+  const handlefinalyze = async (proposalIndex: BigNumber) => {
+    setIndex(proposalIndex);
+    await finalize({ recklessArgs: [proposalIndex] });
+  };
+
+
   return (
     <>
       {proposalArr
         // proposal.end is a BigNumber, so we need to convert it to a number and then compare it to the current time (You have .toString() on BigNumber to convert it to a string human readable string instead of 0x)
-        .filter(proposal => parseFloat(proposal.end.toString()) > Math.floor(Date.now() / 1000))
+        .filter(proposal => proposal.finalized === false)
         .map(proposal => (
           <div key={proposal.index.toString()} className="max-w-6xl mx-auto py-12">
             <div className="bg-white rounded-lg shadow-md w-full px-6 py-8 md:mx-4 mb-6 md:mb-0 text-center overflow-auto justify-between flex-row">
@@ -67,6 +91,18 @@ const Test2: NextPage = () => {
                     >
                       Donate
                     </button>
+                    <button 
+                    className="flex-shrink-0 inline-flex items-center justify-center px-4 py-2 font-medium text-white bg-blue-500 border border-transparent rounded-lg shadow-sm transition duration-200 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 mb-4"
+                    onClick={() => handlecancel(proposal.index)}
+                  >
+                    Refund
+                  </button>
+                  <button 
+                    className="flex-shrink-0 inline-flex items-center justify-center px-4 py-2 font-medium text-white bg-blue-500 border border-transparent rounded-lg shadow-sm transition duration-200 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 mb-4"
+                    onClick={() => handlefinalyze(proposal.index)}
+                  >
+                    Finalize
+                  </button>
                   </div>
                 </div>
               </div>

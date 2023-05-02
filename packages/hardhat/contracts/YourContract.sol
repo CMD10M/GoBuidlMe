@@ -3,14 +3,7 @@ pragma solidity >=0.8.0 <0.9.0;
 
 // Useful for debugging. Remove when deploying to a live network.
 import "hardhat/console.sol";
-// Use openzeppelin to inherit battle-tested implementations (ERC20, ERC721, etc)
-// import "@openzeppelin/contracts/access/Ownable.sol";
 
-/**
- * A smart contract that allows changing a state variable of the contract and tracking the changes
- * It also allows the owner to withdraw the Ether in the contract
- * @author BuidlGuidl
- */
 
 contract GoBuidlMe {
     constructor() {
@@ -81,6 +74,17 @@ function getProposals() public view returns (Proposals[] memory) {
         require(sent, "Failed to send Ether");
         delete proposal.donations;
         }
+
+    // function finalize(uint256 proposalID) public payable {
+    //     Proposals storage proposal = createProposals[proposalID];
+    //     require(block.timestamp > proposal.end, "Proposal has not yet ended");
+    //     require(!proposal.finalized, "Proposal has already been finalized");
+
+    //     proposal.finalized = true;
+    //     (bool sent,) = proposal.beneficiary.call{value: proposal.donations}("");
+    //     require(sent, "Failed to send Ether");
+    //     delete proposal.donations;
+    //     }
 
     function cancel(uint256 proposalID) public payable {
         Proposals storage proposal = createProposals[proposalID];
